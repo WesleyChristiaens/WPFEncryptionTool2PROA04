@@ -34,5 +34,35 @@ namespace WPFEncryptionTool2PROA04
         {
 
         }
+
+        private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnGenerateAES_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RSADecrypt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AESDecrypt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AESEncrypt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -25,15 +25,15 @@
             <StackPanel Margin="0,25">
                 <Label Content="Encrypt" FontSize="16" HorizontalAlignment="Center"></Label>
                 <WrapPanel Margin="0,10" HorizontalAlignment="Center" Background="blue">
-                    <Button x:Name="AESEncrypt" Content="Using AES" Margin="50,0" Click="AESEncrypt_Click"></Button>
-                    <Button x:Name="RSAEncrypt" Content="Using RSA" Margin="50,0" Click="RSAEncrypt_Click"></Button>
+                    <Button x:Name="AESEncrypt" Content="image with AES" Margin="25,0" Padding="10,0" Click="AESEncrypt_Click"></Button>
+                    <Button x:Name="RSAEncrypt" Content="AES key with RSA" Margin="25,0" Padding="10,0" Click="RSAEncrypt_Click"></Button>
                 </WrapPanel>
             </StackPanel>
             <StackPanel Margin="0,25">
                 <Label Content="Decrypt" FontSize="16" HorizontalAlignment="Center"></Label>
                 <WrapPanel Margin="0,10" HorizontalAlignment="Center" Background="Red">
-                    <Button x:Name="RSADecrypt" Content="Using RSA" Margin="50,0" Click="RSADecrypt_Click"></Button>
-                    <Button x:Name="AESDecrypt" Content="Using AES" Margin="50,0" Click="AESDecrypt_Click"></Button>
+                    <Button x:Name="AESDecrypt" Content="Image using AES" Margin="25,0" Padding="10,0" Click="AESDecrypt_Click"></Button>
+                    <Button x:Name="RSADecrypt" Content="AES-key using RSA" Margin="25,0" Padding="10,0" Click="RSADecrypt_Click"></Button>
                 </WrapPanel>
             </StackPanel>
         </StackPanel>
