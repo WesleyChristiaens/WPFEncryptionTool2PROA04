@@ -5,8 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFEncryptionTool2PROA04"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="480" Width="640">
+    <StackPanel>
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem x:Name="MnuOptions" Header="Options" Click="MnuOptions_Click"></MenuItem>
+                <MenuItem x:Name="MnuClose" Header="Close" Click="MnuClose_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <StackPanel Margin="0,50,0,0" HorizontalAlignment="Center">
+            <StackPanel>
+                <Label Content="Save generated Key as:" HorizontalContentAlignment="Center"></Label>
+                <TextBox x:Name="TxtName" Width="250" Margin="10"></TextBox>
+            </StackPanel>
+            <WrapPanel Margin="0,10">
+                <Button x:Name="BtnGenerateAES" Content="Generate AES-Key" Click="BtnGenerateAES_Click" Margin="25,0" Padding="5"></Button>
+                <Button x:Name="BtnGenerateRSA" Content="Generate RSA-Keys" Click="BtnGenerateRSA_Click" Margin="25,0" Padding="5"></Button>
+            </WrapPanel>
+            <StackPanel Margin="0,25">
+                <Label Content="Encrypt" FontSize="16" HorizontalAlignment="Center"></Label>
+                <WrapPanel Margin="0,10" HorizontalAlignment="Center" Background="blue">
+                    <Button x:Name="AESEncrypt" Content="image with AES" Margin="25,0" Padding="10,0" Click="AESEncrypt_Click"></Button>
+                    <Button x:Name="RSAEncrypt" Content="AES key with RSA" Margin="25,0" Padding="10,0" Click="RSAEncrypt_Click"></Button>
+                </WrapPanel>
+            </StackPanel>
+            <StackPanel Margin="0,25">
+                <Label Content="Decrypt" FontSize="16" HorizontalAlignment="Center"></Label>
+                <WrapPanel Margin="0,10" HorizontalAlignment="Center" Background="Red">
+                    <Button x:Name="AESDecrypt" Content="Image using AES" Margin="25,0" Padding="10,0" Click="AESDecrypt_Click"></Button>
+                    <Button x:Name="RSADecrypt" Content="AES-key using RSA" Margin="25,0" Padding="10,0" Click="RSADecrypt_Click"></Button>
+                </WrapPanel>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
 </Window>
