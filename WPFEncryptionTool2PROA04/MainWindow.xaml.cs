@@ -24,5 +24,15 @@ namespace WPFEncryptionTool2PROA04
         {
             InitializeComponent();
         }
+
+        private void MnuOptions_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MnuClose_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
