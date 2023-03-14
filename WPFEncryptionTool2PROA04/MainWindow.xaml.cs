@@ -60,7 +60,8 @@ namespace WPFEncryptionTool2PROA04
 
         private void AESEncrypt_Click(object sender, RoutedEventArgs e)
         {
-
+            var wpf = new AES_Encryption();
+            wpf.ShowDialog();
         }
 
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
