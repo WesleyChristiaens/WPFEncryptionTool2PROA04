@@ -29,7 +29,8 @@ namespace WPFEncryptionTool2PROA04
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
         {
-
+            var wpf = new WpfOptions();
+            wpf.ShowDialog();
         }
 
         private void MnuClose_Click(object sender, RoutedEventArgs e)
