@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,8 +44,9 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnGenerateAES_Click(object sender, RoutedEventArgs e)
         {
-
+            CreateAesKey();
         }
+
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -63,6 +66,27 @@ namespace WPFEncryptionTool2PROA04
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void CreateAesKey()
+        {
+            using (Aes myAes = Aes.Create())
+            {
+                string key = Convert.ToBase64String(myAes.Key);
+                string iv = Convert.ToBase64String(myAes.IV);
+                string keyName = TxtName.Text; //input field from xaml
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"{keyName};{key};{iv}");
+
+                string fileName = @"C:\Github Repositories\WPFEncryptionTool2PROA04\test.txt"; //path name
+                FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs);
+
+                sw.WriteLine(sb);
+
+                sw.Close();
+                fs.Close();
+            }
         }
     }
 }
