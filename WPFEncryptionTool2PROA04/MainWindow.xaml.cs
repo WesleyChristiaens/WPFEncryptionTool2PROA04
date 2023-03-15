@@ -35,7 +35,7 @@ namespace WPFEncryptionTool2PROA04
 
         private void MnuClose_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
 
         private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
