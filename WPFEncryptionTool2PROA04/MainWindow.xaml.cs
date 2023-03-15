@@ -29,12 +29,13 @@ namespace WPFEncryptionTool2PROA04
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
         {
-
+            var wpf = new WpfOptions();
+            wpf.ShowDialog();
         }
 
         private void MnuClose_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
 
         private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
