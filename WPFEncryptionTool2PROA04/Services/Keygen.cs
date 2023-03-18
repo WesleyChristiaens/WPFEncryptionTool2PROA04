@@ -4,15 +4,15 @@ using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
 {
-    public class Encryptor
+    public class Keygen
     {
-        public static AesKey GenerateNewAESKey(string name)
+        public static AesKey GenerateNewAESKey(string nameOfKey)
         {
             AesKey myAesKey = new AesKey();
 
             using (Aes keygen = Aes.Create())
             {
-                myAesKey.Name = name;
+                myAesKey.Name = nameOfKey;
                 myAesKey.Key = Convert.ToBase64String(keygen.Key);
                 myAesKey.InitiationVector = Convert.ToBase64String(keygen.IV);
             }
@@ -20,13 +20,13 @@ namespace WPFEncryptionTool2PROA04
             return myAesKey;
         }
 
-        public static RsaKeyPair GenerateNewRSaKeypair(string name)
+        public static RsaKeyPair GenerateNewRSaKeypair(string nameOfKey)
         {
             var rkp = new RsaKeyPair();
 
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
-                rkp.Name = name;
+                rkp.Name = nameOfKey;
                 rkp.PublicKey = rsa.ToXmlString(false);
                 rkp.PrivateKey = rsa.ToXmlString(true);
             }
