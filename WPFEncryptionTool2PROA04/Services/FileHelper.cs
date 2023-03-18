@@ -80,13 +80,13 @@ namespace WPFEncryptionTool2PROA04
                 .FirstOrDefault(x => x.Name == folderName).Path;
         }
 
-        public static IEnumerable<string> GetKeys(string folder)
+        public static IEnumerable<string> GetKeyNames(string folder)
         {
             var files = new List<string>();
-
-            if (Directory.Exists(folder))
+                      
+            foreach (var record in Directory.EnumerateFiles(folder).ToList())
             {
-                files = Directory.EnumerateFiles(folder).ToList();
+                files.Add(Path.GetFileName(record).Split('.')[0]);
             }
             
             return files;

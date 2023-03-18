@@ -19,9 +19,7 @@ namespace WPFEncryptionTool2PROA04
             {
                 var file = File.Create(Folders.FolderIndex);                    
                 file.Close();                
-            }
-
-            FileHelper.GetKeys(Folders.FolderIndex);
+            }                      
         }
 
 

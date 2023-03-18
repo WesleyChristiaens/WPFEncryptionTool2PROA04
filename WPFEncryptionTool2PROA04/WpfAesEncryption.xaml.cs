@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -16,30 +17,29 @@ namespace WPFEncryptionTool2PROA04
         public WpfAesEncryption()
         {
             InitializeComponent();
-            ListBoxKeyNames();
+            LoadCbo();
         }
 
         List<string> keyList = new List<string>();
-        string selectedFileName = "";
+        string selectedFileName = "";  
+        
 
-        private void ListBoxKeyNames()
+        private void LoadCbo()
         {
-            FileStream fsRead = new FileStream(@"C:\Github Repositories\WPFEncryptionTool2PROA04\test.txt", FileMode.Open, FileAccess.Read); //path name AES key file
-            StreamReader sr = new StreamReader(fsRead);
+            CboAESKeys.Items.Clear();
 
-
-            while (!sr.EndOfStream)
+           var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
+            if (!string.IsNullOrEmpty(path))
             {
-                string line = sr.ReadLine();
-                string keyName = ReadLineArray(line)[0];
-                CboAESKeys.Items.Add(keyName);
-                keyList.Add(line);
+                CboAESKeys.ItemsSource = FileHelper.GetKeyNames(path);
             }
-
-            sr.Close();
-            fsRead.Close();
+            else
+            {
+                CboAESKeys.Items.Add("no keys generated");
+                CboAESKeys.SelectedIndex= 0;
+            }
         }
-
+       
         private string[] ReadLineArray(string line)
         {
             string[] arrayLine = line.Split(';');
