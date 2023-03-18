@@ -1,32 +1,19 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Drawing.Imaging;
-using System.Drawing;
-using Image = System.Drawing.Image;
-using Microsoft.Win32;
 
 namespace WPFEncryptionTool2PROA04
 {
     /// <summary>
     /// Interaction logic for AES_Encryption.xaml
     /// </summary>
-    public partial class AES_Encryption : Window
+    public partial class WpfAesEncryption : Window
     {
-        public AES_Encryption()
+        public WpfAesEncryption()
         {
             InitializeComponent();
             ListBoxKeyNames();

@@ -89,7 +89,7 @@
     <Compile Include="WpfOptions.xaml.cs">
       <DependentUpon>WpfOptions.xaml</DependentUpon>
     </Compile>
-    <Page Include="AES_Encryption.xaml">
+    <Page Include="WpfAesEncryption.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -97,8 +97,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AES_Encryption.xaml.cs">
-      <DependentUpon>AES_Encryption.xaml</DependentUpon>
+    <Compile Include="WpfAesEncryption.xaml.cs">
+      <DependentUpon>WpfAesEncryption.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
