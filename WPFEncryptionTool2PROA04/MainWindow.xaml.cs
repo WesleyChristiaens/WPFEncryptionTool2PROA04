@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -26,6 +18,30 @@ namespace WPFEncryptionTool2PROA04
         {
             InitializeComponent();
         }
+
+        string generatedAESKeysFolder;
+
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {            
+
+            if (!File.Exists(Folders.FolderIndex))
+            {
+                var file = File.Create(Folders.FolderIndex);                    
+                file.Close();                
+            }
+
+            var content = File.ReadAllText(Folders.FolderIndex);           
+
+            if (content.Contains(Folders.GeneratedAESKeys))
+            {
+                generatedAESKeysFolder = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
+            }
+
+
+        }
+
+
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
         {
@@ -90,5 +106,7 @@ namespace WPFEncryptionTool2PROA04
                 fs.Close();
             }
         }
+
+
     }
 }
