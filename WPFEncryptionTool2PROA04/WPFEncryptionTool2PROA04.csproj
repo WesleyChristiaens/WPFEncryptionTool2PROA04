@@ -84,6 +84,7 @@
     </ApplicationDefinition>
     <Compile Include="Services\FileHelper.cs" />
     <Compile Include="Services\Folders.cs" />
+    <Compile Include="Services\Encryptor.cs" />
     <Compile Include="Models\AesKey.cs" />
     <Compile Include="Models\FileResult.cs" />
     <Compile Include="Models\Folder.cs" />
