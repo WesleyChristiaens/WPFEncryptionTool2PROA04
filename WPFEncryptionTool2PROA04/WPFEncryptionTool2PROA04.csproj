@@ -82,8 +82,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileHelper.cs" />
-    <Compile Include="Folders.cs" />
+    <Compile Include="Services\FileHelper.cs" />
+    <Compile Include="Services\Folders.cs" />
     <Compile Include="Models\FileResult.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="WpfOptions.xaml.cs">

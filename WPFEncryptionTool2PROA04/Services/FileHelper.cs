@@ -10,7 +10,7 @@ namespace WPFEncryptionTool2PROA04
 {
     public class FileHelper
     {
-               public static FileResult<T> WriteCsv<T>(IEnumerable<T> collection, string filepath)
+        public static FileResult<T> WriteCsv<T>(IEnumerable<T> collection, string filepath)
         {
             FileResult<T> result = new FileResult<T>();
 
@@ -25,7 +25,7 @@ namespace WPFEncryptionTool2PROA04
                             using (var csv = new CsvWriter(sw, CultureInfo.InvariantCulture))
                             {
                                 csv.WriteRecords(collection);
-                                
+
                             }
 
                             sw.Close();
@@ -36,9 +36,8 @@ namespace WPFEncryptionTool2PROA04
             }
             catch (Exception ex)
             {
-                throw;
-                /*result.Succeeded = false;
-                result.Errors.Append(ex.Message);*/
+                result.Succeeded = false;
+                result.Errors.Append(ex.Message);
             }
 
             return result;
@@ -72,46 +71,25 @@ namespace WPFEncryptionTool2PROA04
             }
 
             return result;
-        }
-
-        public static FileResult<string> WriteStringToFile(IEnumerable<string> collection, string filepath)
-        {
-            FileResult<string> result = new FileResult<string>();
-
-            try
-            {
-                if (ValidateCollection<string>(collection))
-                {
-                    using (var fs = new FileStream(filepath, FileMode.OpenOrCreate))
-                    {
-                        using (var sr = new StreamWriter(fs))
-                        {
-                            foreach (var item in collection)
-                            {
-                                sr.WriteLine(item);
-                            }
-
-                            result.Succeeded = true;
-                            sr.Close();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-                /*result.Succeeded = false;
-                result.Errors.Append(ex.Message.ToString());*/
-            }
-
-            return result;
-        }
+        }               
 
         public static string GetFolderPath(string folderName)
         {
             return
                 ReadCsv<Folder>(Folders.FolderIndex).records
                 .FirstOrDefault(x => x.Name == folderName).Path;
+        }
+
+        public static IEnumerable<string> GetKeys(string folder)
+        {
+            var files = new List<string>();
+
+            if (Directory.Exists(folder))
+            {
+                files = Directory.EnumerateFiles(folder).ToList();
+            }
+            
+            return files;
         }
 
         private static bool ValidateCollection<T>(IEnumerable<T> collection)
