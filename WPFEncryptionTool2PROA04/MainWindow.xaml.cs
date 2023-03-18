@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text;
 using System.Windows;
+using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -17,12 +20,10 @@ namespace WPFEncryptionTool2PROA04
         {  
             if (!File.Exists(Folders.FolderIndex))
             {
-                var file = File.Create(Folders.FolderIndex);                    
+                var file = File.Create(Folders.FolderIndex);                
                 file.Close();                
             }                      
         }
-
-
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
         {
@@ -36,17 +37,18 @@ namespace WPFEncryptionTool2PROA04
         }
 
         private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
-        {           
-            Encryptor.GenerateNewRSaKeypair(TxtName.Text);
-
-
+        {
+            ValidateTextBoxinput(TxtName.Text);
+            var rkp = Keygen.GenerateNewRSaKeypair(TxtName.Text);
+            ShowOperationResult(FileHelper.StoreRSAKeyPair(rkp));
         }
 
         private void BtnGenerateAES_Click(object sender, RoutedEventArgs e)
-        {            
-            Encryptor.GenerateNewAESKey(TxtName.Text);
+        {
+            ValidateTextBoxinput(TxtName.Text);
+            var aesKey = Keygen.GenerateNewAESKey(TxtName.Text);
+            ShowOperationResult(FileHelper.StoreAesKey(aesKey));
         }
-
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -69,11 +71,48 @@ namespace WPFEncryptionTool2PROA04
             
         }
 
-       
 
-        
 
-        
+        private void ValidateTextBoxinput(string input)
+        {
+            if (input == string.Empty)
+            {
+                MessageBox.Show("Please enter a name for your new key");
+                return;
+            }
+
+            if (input.Contains("."))
+            {
+                MessageBox.Show("Character '.' is not allowed in the name ");
+                return;
+            }
+
+        }
+
+        private void ShowOperationResult(SaveResult result)
+        {
+            if (result.Succeeded)
+            {
+                MessageBox.Show("Key succesfully generated", "Operation succesfull", MessageBoxButton.OK);
+            }
+            else
+            {
+                var sb = new StringBuilder();
+                foreach (var item in result.Errors)
+                {
+                    sb.AppendLine(item);
+                    sb.Append(Environment.NewLine);
+                }
+
+                MessageBox.Show($"{sb.ToString()}", "Error", MessageBoxButton.OK);
+            }
+        }
+
+
+
+
+
+
 
 
     }
