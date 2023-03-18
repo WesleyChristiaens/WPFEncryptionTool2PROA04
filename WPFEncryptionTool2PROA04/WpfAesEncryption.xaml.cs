@@ -19,19 +19,15 @@ namespace WPFEncryptionTool2PROA04
             InitializeComponent();
             LoadCbo();
         }
-
-        List<string> keyList = new List<string>();
-        string selectedFileName = "";  
-        
-
         private void LoadCbo()
         {
             CboAESKeys.Items.Clear();
 
            var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
+
             if (!string.IsNullOrEmpty(path))
             {
-                CboAESKeys.ItemsSource = FileHelper.GetKeyNames(path);
+                CboAESKeys.ItemsSource = FileHelper.GetDirectoryContent(path);
             }
             else
             {
@@ -39,6 +35,11 @@ namespace WPFEncryptionTool2PROA04
                 CboAESKeys.SelectedIndex= 0;
             }
         }
+
+        List<string> keyList = new List<string>();
+        string selectedFileName = "";  
+        
+
        
         private string[] ReadLineArray(string line)
         {
