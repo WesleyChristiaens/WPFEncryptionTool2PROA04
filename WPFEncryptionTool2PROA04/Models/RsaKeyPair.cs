@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace WPFEncryptionTool2PROA04.Models
 {
-    public class RsaKeyPair
-    {
-        public string Name { get; set; }
+    public class RsaKeyPair : Key
+    {        
         public string PublicKey { get; set; }
         public string PrivateKey { get; set; }
     }
