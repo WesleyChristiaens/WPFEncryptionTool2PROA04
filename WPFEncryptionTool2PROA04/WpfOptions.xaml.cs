@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -21,17 +22,12 @@ namespace WPFEncryptionTool2PROA04
             InitializeComponent();
         }
 
-        Dictionary<string, string> folders;
+        IEnumerable<Folder> folders;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!File.Exists(FileHelper.FolderIndex))
-            {
-                SaveFolders();
-            }
-
-            ReadFolderIndex();
-            LoadFoldersinTextBox();
+        {            
+            folders = ReadFolderIndex();
+            LoadFoldersinTextBox();            
         }
         private void FolderSelectBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -41,33 +37,7 @@ namespace WPFEncryptionTool2PROA04
 
             if (fbd.SelectedPath.Any())
             {
-                switch (btn.Name)
-                {
-                    case "BtnGeneratedAESKeys":
-                        TxtGeneratedAESKeys.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnDecryptedAESKeys":
-                        TxtDecryptedAESKeys.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnRSAEncryptedAESKeys":
-                        TxtRSAEncryptedAESKeys.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnAESEncryptedImages":
-                        TxtAESEncryptedImages.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnImages":
-                        TxtImages.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnRSAPublicKeys":
-                        TxtRSAPublicKeys.Text = fbd.SelectedPath;
-                        break;
-                    case "BtnRSAPrivateKeys":
-                        TxtRSAPrivateKeys.Text = fbd.SelectedPath;
-                        break;
-                    default:
-                        break;
-                }
-
+                ShowSelectedFolder(btn.Name,fbd.SelectedPath);
             }
 
         }
@@ -80,44 +50,39 @@ namespace WPFEncryptionTool2PROA04
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
 
-            if (SaveFolders())
-            {
-                MessageBoxResult message = MessageBox.Show("Folders stored succesfully", "Success", MessageBoxButton.OK);
-
-                if (message == MessageBoxResult.OK)
-                {
-                    this.Close();
-                }
-            }
+            SaveFolders();
 
         }
 
-        private bool SaveFolders()
+        private void SaveFolders()
         {
-            bool result = false;
+            var result = FileHelper.WriteCsv(GetContentOfTextBoxes(), Folders.FolderIndex);
+            MessageBoxResult message;
 
-            try
+            if (result.Succeeded)
             {
-                FileHelper.WriteToCsv(GetContentOfTextBoxes());
-                result = true;
+                message = MessageBox.Show("Folders stored succesfully", "Success", MessageBoxButton.OK);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBoxResult r = MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
-
-                if (r == MessageBoxResult.OK)
+                StringBuilder sb = new StringBuilder();
+                foreach (var item in result.Errors)
                 {
-                    this.Close();
+                    sb.AppendLine(item);
                 }
+
+                message = MessageBox.Show($"{sb.ToString()}", "Error", MessageBoxButton.OK);
             }
 
-            return result;
+            if (message == MessageBoxResult.OK)
+            { 
+                this.Close(); 
+            }
         }
 
-        private List<Folder> GetContentOfTextBoxes()
+        private IEnumerable<Folder> GetContentOfTextBoxes()
         {
             //Reads the content of all the textboxes to a List
-
             List<Folder> lst = new List<Folder>();
 
             foreach (var child in Stack.Children)
@@ -131,14 +96,9 @@ namespace WPFEncryptionTool2PROA04
                         if (element.GetType().Equals(typeof(TextBox)))
                         {
                             var textbox = element as TextBox;
-                            if (!string.IsNullOrEmpty(textbox.Text))
-                            {
-                                lst.Add(new Folder() { Name = textbox.Name.Substring(3), path = textbox.Text });
-                            }
-                            else
-                            {
-                                lst.Add(new Folder() { Name = textbox.Name.Substring(3) });
-                            }
+
+                            lst.Add(new Folder() { Name = textbox.Name.Substring(3), Path = textbox.Text });
+
                         }
                     }
                 }
@@ -161,9 +121,12 @@ namespace WPFEncryptionTool2PROA04
                         {
                             var textbox = element as TextBox;
 
-                            if (folders.ContainsKey(textbox.Name))
+                            foreach (var folder in folders)
                             {
-                                textbox.Text = folders[textbox.Name];
+                                if ($"Txt{folder.Name}" == textbox.Name)
+                                {
+                                    textbox.Text = folder.Path;
+                                }
                             }
                         }
                     }
@@ -171,23 +134,48 @@ namespace WPFEncryptionTool2PROA04
             }
         }
 
-        private void ReadFolderIndex()
+        private IEnumerable<Folder> ReadFolderIndex()
         {
-            folders = new Dictionary<string, string>();
-
-            var records = FileHelper.ReadCsv<Folder>(FileHelper.FolderIndex);
-
-            foreach (var record in records)
+            IEnumerable<Folder> lst = new List<Folder>();
+            
+            if (File.ReadAllText(Folders.FolderIndex) != string.Empty)
             {
-                if (folders.Keys.Contains($"Txt{record.Name}"))
-                {
-                    folders[record.Name] = record.path;
-                }
-                else
-                {
-                    folders.Add($"Txt{record.Name}", record.path);
-                }
+                lst = FileHelper.ReadCsv<Folder>(Folders.FolderIndex).records;
+            }
+
+            return lst.ToList();
+        }
+
+        private void ShowSelectedFolder(string btnName,string selectedPath)
+        {
+            switch (btnName)
+            {
+                case "BtnGeneratedAESKeys":
+                    TxtGeneratedAESKeys.Text = selectedPath;
+                    break;
+                case "BtnDecryptedAESKeys":
+                    TxtDecryptedAESKeys.Text = selectedPath;
+                    break;
+                case "BtnRSAEncryptedAESKeys":
+                    TxtRSAEncryptedAESKeys.Text = selectedPath;
+                    break;
+                case "BtnAESEncryptedImages":
+                    TxtAESEncryptedImages.Text = selectedPath;
+                    break;
+                case "BtnImages":
+                    TxtImages.Text = selectedPath;
+                    break;
+                case "BtnRSAPublicKeys":
+                    TxtRSAPublicKeys.Text = selectedPath;
+                    break;
+                case "BtnRSAPrivateKeys":
+                    TxtRSAPrivateKeys.Text = selectedPath;
+                    break;
+                default:
+                    break;
             }
         }
+
+
     }
 }
