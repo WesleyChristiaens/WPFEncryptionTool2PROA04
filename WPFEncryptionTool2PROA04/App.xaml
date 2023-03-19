@@ -1,7 +1,7 @@
 ﻿<Application x:Class="WPFEncryptionTool2PROA04.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WPFEncryptionTool2PROA04"
+             xmlns:local="clr-namespace:WPFEncryptionTool2PROA04"             
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

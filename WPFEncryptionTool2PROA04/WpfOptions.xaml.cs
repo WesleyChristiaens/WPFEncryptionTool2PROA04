@@ -1,13 +1,9 @@
-﻿using CsvHelper;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
@@ -22,12 +18,11 @@ namespace WPFEncryptionTool2PROA04
             InitializeComponent();
         }
 
-        IEnumerable<Folder> folders;
+        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
-        {            
-            folders = ReadFolderIndex();
-            LoadFoldersinTextBox();            
+        {                        
+            SetContentOfTextBoxes(ReadFolderIndex());            
         }
         private void FolderSelectBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -107,7 +102,7 @@ namespace WPFEncryptionTool2PROA04
             return lst;
         }
 
-        private void LoadFoldersinTextBox()
+        private void SetContentOfTextBoxes(IEnumerable<Folder> folders)
         {
             foreach (var child in Stack.Children)
             {

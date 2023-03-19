@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
+using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -19,29 +16,14 @@ namespace WPFEncryptionTool2PROA04
             InitializeComponent();
         }
 
-        string generatedAESKeysFolder;
-
-
         private async void Window_Loaded(object sender, RoutedEventArgs e)
-        {            
-
+        {
             if (!File.Exists(Folders.FolderIndex))
             {
-                var file = File.Create(Folders.FolderIndex);                    
-                file.Close();                
+                var file = File.Create(Folders.FolderIndex);
+                file.Close();
             }
-
-            var content = File.ReadAllText(Folders.FolderIndex);           
-
-            if (content.Contains(Folders.GeneratedAESKeys))
-            {
-                generatedAESKeysFolder = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
-            }
-
-
         }
-
-
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
         {
@@ -56,14 +38,21 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
         {
-
+            if (ValidateTextBoxinput(TxtName.Text))
+            {
+                var rkp = Keygen.GenerateNewRSaKeypair(TxtName.Text);
+                ShowOperationResult(FileHelper.StoreRSAKeyPair(rkp));
+            }
         }
 
         private void BtnGenerateAES_Click(object sender, RoutedEventArgs e)
         {
-            CreateAesKey();
+            if (ValidateTextBoxinput(TxtName.Text))
+            {
+                var aesKey = Keygen.GenerateNewAESKey(TxtName.Text);
+                ShowOperationResult(FileHelper.StoreAesKey(aesKey));
+            }          
         }
-
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -77,7 +66,7 @@ namespace WPFEncryptionTool2PROA04
 
         private void AESEncrypt_Click(object sender, RoutedEventArgs e)
         {
-            var wpf = new AES_Encryption();
+            var wpf = new WpfAesEncryption();
             wpf.ShowDialog();
         }
 
@@ -86,26 +75,52 @@ namespace WPFEncryptionTool2PROA04
 
         }
 
-        private void CreateAesKey()
+
+
+        private bool ValidateTextBoxinput(string input)
         {
-            using (Aes myAes = Aes.Create())
+            bool validation = true;
+
+            if (input == string.Empty)
             {
-                string key = Convert.ToBase64String(myAes.Key);
-                string iv = Convert.ToBase64String(myAes.IV);
-                string keyName = TxtName.Text; //input field from xaml
-                StringBuilder sb = new StringBuilder();
-                sb.Append($"{keyName};{key};{iv}");
+                MessageBox.Show("Please enter a name for your new key");
+                validation = false;
+            }
 
-                string fileName = @"C:\Github Repositories\WPFEncryptionTool2PROA04\test.txt"; //path name
-                FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write);
-                StreamWriter sw = new StreamWriter(fs);
+            if (input.Contains("."))
+            {
+                MessageBox.Show("Character '.' is not allowed in the name ");
+                validation = false;
+            }
 
-                sw.WriteLine(sb);
+            return validation;
 
-                sw.Close();
-                fs.Close();
+        }
+
+        private void ShowOperationResult(SaveResult result)
+        {
+            if (result.Succeeded)
+            {
+                MessageBox.Show("Key succesfully generated", "Operation succesfull", MessageBoxButton.OK);
+            }
+            else
+            {
+                var sb = new StringBuilder();
+                foreach (var item in result.Errors)
+                {
+                    sb.AppendLine(item);
+                    sb.Append(Environment.NewLine);
+                }
+
+                MessageBox.Show($"{sb.ToString()}", "Error", MessageBoxButton.OK);
             }
         }
+
+
+
+
+
+
 
 
     }

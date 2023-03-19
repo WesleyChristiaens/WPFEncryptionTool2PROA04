@@ -1,58 +1,46 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Drawing.Imaging;
-using System.Drawing;
-using Image = System.Drawing.Image;
-using Microsoft.Win32;
 
 namespace WPFEncryptionTool2PROA04
 {
     /// <summary>
     /// Interaction logic for AES_Encryption.xaml
     /// </summary>
-    public partial class AES_Encryption : Window
+    public partial class WpfAesEncryption : Window
     {
-        public AES_Encryption()
+        public WpfAesEncryption()
         {
             InitializeComponent();
-            ListBoxKeyNames();
+            LoadCbo();
+        }
+        private void LoadCbo()
+        {
+            CboAESKeys.Items.Clear();
+
+           var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                CboAESKeys.ItemsSource = FileHelper.GetDirectoryContent(path);
+            }
+            else
+            {
+                CboAESKeys.Items.Add("no keys generated");
+                CboAESKeys.SelectedIndex= 0;
+            }
         }
 
         List<string> keyList = new List<string>();
-        string selectedFileName = "";
+        string selectedFileName = "";  
+        
 
-        private void ListBoxKeyNames()
-        {
-            FileStream fsRead = new FileStream(@"C:\Github Repositories\WPFEncryptionTool2PROA04\test.txt", FileMode.Open, FileAccess.Read); //path name AES key file
-            StreamReader sr = new StreamReader(fsRead);
-
-
-            while (!sr.EndOfStream)
-            {
-                string line = sr.ReadLine();
-                string keyName = ReadLineArray(line)[0];
-                CboAESKeys.Items.Add(keyName);
-                keyList.Add(line);
-            }
-
-            sr.Close();
-            fsRead.Close();
-        }
-
+       
         private string[] ReadLineArray(string line)
         {
             string[] arrayLine = line.Split(';');

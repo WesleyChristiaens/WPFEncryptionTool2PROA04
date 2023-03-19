@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Packaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WPFEncryptionTool2PROA04
 {
     public class Folders
     {
-        public static string FolderIndex = Path.Combine(Environment.CurrentDirectory, "DefaultFolders.csv");
+        public static string Application = Environment.CurrentDirectory;
+        public static string FolderIndex = Path.Combine(Folders.Application, "DefaultFolders.csv");
         public const string GeneratedAESKeys = "GeneratedAESKeys";
         public const string DecryptedAESKeys = "DecryptedAESKeys";
         public const string RSAEncryptedAESKeys = "RSAEncryptedAESKeys";
