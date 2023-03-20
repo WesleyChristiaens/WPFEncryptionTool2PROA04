@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -37,6 +38,7 @@ namespace WPFEncryptionTool2PROA04
         }
 
         List<string> keyList = new List<string>();
+
         string selectedFileName = "";  
         
 
@@ -123,7 +125,6 @@ namespace WPFEncryptionTool2PROA04
                                     IV = Convert.FromBase64String(arrayKeys[2]);
                                     var encryptedImage = EncryptStringToBytes_Aes(base64Image, AesKey, IV);
                                     string encryptedImageBase64 = Convert.ToBase64String(encryptedImage);
-
                                     using (StreamWriter sw = File.CreateText(@"C:\Github Repositories\WPFEncryptionTool2PROA04\AESImages\" + TxtFileName.Text + ".txt")) //dynamic path encrypted AES images
                                     {
                                         sw.WriteLine(encryptedImageBase64);
@@ -151,6 +152,11 @@ namespace WPFEncryptionTool2PROA04
             {
                 MessageBox.Show(ex.Message);
             }
-        }      
+        }
+
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

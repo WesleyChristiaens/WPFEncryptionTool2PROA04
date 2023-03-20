@@ -27,10 +27,15 @@
                 </Border>
             </StackPanel>
         </WrapPanel>
-        <WrapPanel Height="50" VerticalAlignment="Bottom" Margin="10">
-            <Label Content="Save cyphertext as:" FontWeight="Bold"></Label>
-            <TextBox Width="200" x:Name="TxtFileName" FontSize="14"></TextBox>
-            <Button x:Name="BtnEncrypt" Width="100" Content="Encrypt image" Margin="205 0 0 0" FontWeight="Bold" Click="BtnEncrypt_Click"></Button>
+        <WrapPanel VerticalAlignment="Bottom" Margin="10,0,10,20" Width="780">
+            <WrapPanel Width="390">
+                <Label Content="Save cyphertext as:" FontWeight="Bold"></Label>
+                <TextBox Width="200" x:Name="TxtFileName" FontSize="14"></TextBox>
+            </WrapPanel>
+            <WrapPanel Width="390">
+                <Button x:Name="BtnEncrypt" Width="100" Content="Encrypt image" Margin="15,0"  FontWeight="Bold" Click="BtnEncrypt_Click"></Button>
+                <Button x:Name="BtnCancel" Width="100" Content="Cancel" Margin="100,0,0,0" Click="BtnCancel_Click"></Button>
+            </WrapPanel>
         </WrapPanel>
     </Grid>
 </Window>
