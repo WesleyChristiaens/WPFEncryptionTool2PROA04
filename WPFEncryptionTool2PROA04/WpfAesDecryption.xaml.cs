@@ -59,11 +59,32 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
 
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
+            if (CboAESKeys.SelectedIndex == -1)
+            {
+                MessageBox.Show("Select an AES key to decrypt");
+                return;
+            }
+            if (CboImages.SelectedIndex == -1)
+            {
+                MessageBox.Show("Select an image to decrypt");
+                return;
+            }
+            if (String.IsNullOrEmpty(FileHelper.GetFolderPath(Folders.Images)))
+            {
+                MessageBox.Show("Please set standard folders first");
+                return;
+            }
+            if (String.IsNullOrEmpty(TxtFileName.Text))
+            {
+                MessageBox.Show("Please specify file name");
+                return;
+            }
+
             var encryptedImage = getImage();
             var selectedkey = CboAESKeys.SelectedItem.ToString();
             AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
@@ -73,9 +94,11 @@ namespace WPFEncryptionTool2PROA04
 
         private void SaveImage(byte[] imageByteArray)
         {
+            string folderPath = FileHelper.GetFolderPath(Folders.Images);
+            string filePath = Path.Combine(folderPath, TxtFileName.Text);
             using (Image image = Image.FromStream(new MemoryStream(imageByteArray)))
             {
-                image.Save("output.jpg", ImageFormat.Jpeg);
+                image.Save(filePath, ImageFormat.Jpeg);
             }
         }
 
