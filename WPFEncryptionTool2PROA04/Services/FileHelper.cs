@@ -1,11 +1,16 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Buffers.Text;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Documents;
 using WPFEncryptionTool2PROA04.Models;
 using static System.Net.WebRequestMethods;
 
@@ -110,7 +115,7 @@ namespace WPFEncryptionTool2PROA04
         {
             string path = "";
 
-            if (System.IO.File.Exists(Folders.FolderIndex) && !string.IsNullOrEmpty(System.IO.File.ReadAllText(Folders.FolderIndex)) )
+            if (System.IO.File.Exists(Folders.FolderIndex) && !string.IsNullOrEmpty(System.IO.File.ReadAllText(Folders.FolderIndex)))
             {
                 path = ReadCsv<Folder>(Folders.FolderIndex).records
                 .FirstOrDefault(x => x.Name == folderName).Path;
@@ -164,7 +169,7 @@ namespace WPFEncryptionTool2PROA04
                 {
                     if (!GetDirectoryContent(path).ToList().Contains(generatedKey.Name))
                     {
-                        WriteCsv(generatedKey, Path.Combine(path, generatedKey.Name));
+                        WriteCsv<AesKey>(generatedKey, Path.Combine(path, generatedKey.Name));
                         result.Succeeded = true;
                     }
                     else
@@ -225,6 +230,42 @@ namespace WPFEncryptionTool2PROA04
             }
 
             return result;
+        }
+
+        public static AesKey GetAesKey(string foldername, string selectedkey)
+        {
+            var filepath = GetFolderPath(Folders.GeneratedAESKeys);
+            var file = Path.Combine(filepath, selectedkey);
+
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            {
+                config.HasHeaderRecord = false;
+            }
+
+            AesKey key = new AesKey();
+
+            try
+            {
+                using (var reader = new StreamReader(file))
+                {
+                    using (var csv = new CsvReader(reader, config))
+                    {
+                        while (csv.Read())
+                        {
+                           key = csv.GetRecord<AesKey>();
+                        }
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception)
+            {                          
+                throw;
+            }
+
+            return key;
+            
         }
     }
 }
