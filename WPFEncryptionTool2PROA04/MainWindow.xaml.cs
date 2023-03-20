@@ -61,7 +61,8 @@ namespace WPFEncryptionTool2PROA04
 
         private void AESDecrypt_Click(object sender, RoutedEventArgs e)
         {
-
+            var wpf = new WpfAesDecryption();
+            wpf.ShowDialog();
         }
 
         private void AESEncrypt_Click(object sender, RoutedEventArgs e)

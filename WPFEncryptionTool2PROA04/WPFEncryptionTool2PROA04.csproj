@@ -91,9 +91,16 @@
     <Compile Include="Models\FileResult.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\RsaKeyPair.cs" />
+    <Compile Include="WpfAesDecryption.xaml.cs">
+      <DependentUpon>WpfAesDecryption.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WpfOptions.xaml.cs">
       <DependentUpon>WpfOptions.xaml</DependentUpon>
     </Compile>
+    <Page Include="WpfAesDecryption.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WpfAesEncryption.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
