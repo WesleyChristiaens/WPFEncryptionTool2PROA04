@@ -102,6 +102,9 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnEncrypt_Click(object sender, RoutedEventArgs e)
         {
+            var selectedkey = CboAESKeys.SelectedItem.ToString();
+            AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
+
             try
             {
                 if (CboAESKeys.SelectedIndex != -1)
