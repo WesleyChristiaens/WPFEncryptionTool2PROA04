@@ -65,12 +65,10 @@ namespace WPFEncryptionTool2PROA04
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
             var encryptedImage = getImage();
-
-            var aesKey = "";
+            var selectedkey = CboAESKeys.SelectedItem.ToString();
+            AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
             var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey);
-
-            byte[] imageByteArray = Convert.FromBase64String(decryptedImage);
-            SaveImage(imageByteArray);
+            SaveImage(decryptedImage);
         }
 
         private void SaveImage(byte[] imageByteArray)
@@ -81,17 +79,17 @@ namespace WPFEncryptionTool2PROA04
             }
         }
 
-        private string getImage()
+        private byte[] getImage()
         {
             string encryptedImage = "";
             var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
             var array = FileHelper.GetDirectoryContent(path).Where(x => x.Equals(CboImages.SelectedItem));
 
             
-            return encryptedImage;
+            return Encoding.ASCII.GetBytes(encryptedImage);
         }
 
-        static string DecryptStringFromBytes_Aes(byte[] cipherText, AesKey aesKey)
+        static byte[] DecryptStringFromBytes_Aes(byte[] cipherText, AesKey aesKey)
         {
             // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
@@ -121,7 +119,8 @@ namespace WPFEncryptionTool2PROA04
                     }
                 }
             }
-            return plaintext;
+
+            return Convert.FromBase64String(plaintext);
         }
     }
 }
