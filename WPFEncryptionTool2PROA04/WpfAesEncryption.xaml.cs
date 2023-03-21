@@ -97,7 +97,7 @@ namespace WPFEncryptionTool2PROA04
         {
             try
             {
-                if (CboAESKeys.SelectedIndex == -1)
+                if (CboAESKeys.SelectedIndex == -1 || CboAESKeys.SelectedIndex.ToString() == "no keys generated")
                 {
                     MessageBox.Show("Select an AES key to encrypt");
                     return;
@@ -123,6 +123,7 @@ namespace WPFEncryptionTool2PROA04
                 AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
                 var encryptedImage = EncryptStringToBytes_Aes(base64Image, aesKey);
                 SaveEncryptedImage(encryptedImage);
+                MessageBox.Show("Your image has been encrypted succesfully");
             }
             catch (CryptographicException ex)
             {

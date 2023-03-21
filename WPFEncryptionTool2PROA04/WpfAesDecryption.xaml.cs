@@ -46,8 +46,9 @@ namespace WPFEncryptionTool2PROA04
             CboImages.Items.Clear();
 
             var path = FileHelper.GetFolderPath(Folders.AESEncryptedImages);
+            var folderContent = FileHelper.GetDirectoryContent(path);
 
-            if (!string.IsNullOrEmpty(path))
+            if (folderContent.Count() > 0)
             {
                 CboImages.ItemsSource = FileHelper.GetDirectoryContent(path);
             }
@@ -67,12 +68,12 @@ namespace WPFEncryptionTool2PROA04
         {
             try
             {
-                if (CboAESKeys.SelectedIndex == -1)
+                if (CboAESKeys.SelectedIndex == -1 || CboAESKeys.SelectedIndex.ToString() == "no keys generated")
                 {
                     MessageBox.Show("Select an AES key to decrypt");
                     return;
                 }
-                if (CboImages.SelectedIndex == -1)
+                if (CboImages.SelectedIndex == -1 || CboImages.SelectedIndex.ToString() == "no encrypted images found")
                 {
                     MessageBox.Show("Select an image to decrypt");
                     return;
@@ -93,6 +94,7 @@ namespace WPFEncryptionTool2PROA04
                 AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
                 var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey);
                 SaveImage(decryptedImage);
+                MessageBox.Show("Your image has been decrypted succesfully");
             }
             catch (CryptographicException ex)
             {
