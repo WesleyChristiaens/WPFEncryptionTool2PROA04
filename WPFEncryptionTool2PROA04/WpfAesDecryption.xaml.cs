@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using WPFEncryptionTool2PROA04.Models;
 using Image = System.Drawing.Image;
 
@@ -20,7 +21,6 @@ namespace WPFEncryptionTool2PROA04
             InitializeComponent();
             LoadCbo();
             LoadImagesCbo();
-            getImage();
         }
 
         private void LoadCbo()
@@ -28,8 +28,9 @@ namespace WPFEncryptionTool2PROA04
             CboAESKeys.Items.Clear();
 
             var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
+            var folderContent = FileHelper.GetDirectoryContent(path);
 
-            if (!string.IsNullOrEmpty(path))
+            if (folderContent.Count() > 0)
             {
                 CboAESKeys.ItemsSource = FileHelper.GetDirectoryContent(path);
             }
@@ -64,32 +65,39 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
-            if (CboAESKeys.SelectedIndex == -1)
+            try
             {
-                MessageBox.Show("Select an AES key to decrypt");
-                return;
-            }
-            if (CboImages.SelectedIndex == -1)
-            {
-                MessageBox.Show("Select an image to decrypt");
-                return;
-            }
-            if (String.IsNullOrEmpty(FileHelper.GetFolderPath(Folders.Images)))
-            {
-                MessageBox.Show("Please set standard folders first");
-                return;
-            }
-            if (String.IsNullOrEmpty(TxtFileName.Text))
-            {
-                MessageBox.Show("Please specify file name");
-                return;
-            }
+                if (CboAESKeys.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Select an AES key to decrypt");
+                    return;
+                }
+                if (CboImages.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Select an image to decrypt");
+                    return;
+                }
+                if (String.IsNullOrEmpty(FileHelper.GetFolderPath(Folders.Images)))
+                {
+                    MessageBox.Show("Please set standard folders first");
+                    return;
+                }
+                if (String.IsNullOrEmpty(TxtFileName.Text))
+                {
+                    MessageBox.Show("Please specify file name");
+                    return;
+                }
 
-            var encryptedImage = getImage();
-            var selectedkey = CboAESKeys.SelectedItem.ToString();
-            AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
-            var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey);
-            SaveImage(decryptedImage);
+                var encryptedImage = getImage();
+                var selectedkey = CboAESKeys.SelectedItem.ToString();
+                AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
+                var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey);
+                SaveImage(decryptedImage);
+            }
+            catch (CryptographicException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void SaveImage(byte[] imageByteArray)
@@ -98,18 +106,20 @@ namespace WPFEncryptionTool2PROA04
             string filePath = Path.Combine(folderPath, TxtFileName.Text);
             using (Image image = Image.FromStream(new MemoryStream(imageByteArray)))
             {
-                image.Save(filePath, ImageFormat.Jpeg);
+                image.Save(filePath + ".jpg", ImageFormat.Jpeg);
             }
+
+            Uri fileUri = new Uri(filePath + ".jpg");
+            ImgToEncrypt.Source = new BitmapImage(fileUri);
         }
 
         private byte[] getImage()
         {
-            string encryptedImage = "";
-            var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
-            var array = FileHelper.GetDirectoryContent(path).Where(x => x.Equals(CboImages.SelectedItem));
-
             
-            return Encoding.ASCII.GetBytes(encryptedImage);
+            var path = Path.Combine(FileHelper.GetFolderPath(Folders.AESEncryptedImages), CboImages.SelectedItem.ToString());
+            string encryptedImage = FileHelper.ReadStringFromCsv(path);
+
+            return Convert.FromBase64String(encryptedImage);
         }
 
         static byte[] DecryptStringFromBytes_Aes(byte[] cipherText, AesKey aesKey)
@@ -126,8 +136,8 @@ namespace WPFEncryptionTool2PROA04
 
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.ASCII.GetBytes(aesKey.Key);
-                aesAlg.IV = Encoding.ASCII.GetBytes(aesKey.InitiationVector);
+                aesAlg.Key = Convert.FromBase64String(aesKey.Key);
+                aesAlg.IV = Convert.FromBase64String(aesKey.InitiationVector);
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 

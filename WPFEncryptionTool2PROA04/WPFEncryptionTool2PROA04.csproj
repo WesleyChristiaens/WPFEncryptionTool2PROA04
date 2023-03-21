@@ -82,6 +82,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\EncryptedImage.cs" />
     <Compile Include="Models\Key.cs" />
     <Compile Include="Models\SaveResult.cs" />
     <Compile Include="Services\FileHelper.cs" />

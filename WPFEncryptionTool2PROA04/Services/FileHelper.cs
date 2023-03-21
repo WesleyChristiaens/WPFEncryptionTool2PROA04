@@ -82,6 +82,53 @@ namespace WPFEncryptionTool2PROA04
 
             return result;
         }
+
+        public static SaveResult WriteStringToCsv(string input, string filepath)
+        {
+            SaveResult result = new SaveResult();
+            try
+            {
+                if (input != "")
+                {
+                    System.IO.File.WriteAllText(filepath, input);
+                    result.Succeeded = true;
+                }
+                else
+                {
+                    result.Succeeded = false;
+                    result.Errors.Add("The encryption failed");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return result;
+        }
+
+        public static string ReadStringFromCsv(string filepath)
+        {
+            string result = "";
+            try
+            {
+                if (filepath != "")
+                {
+                    result = System.IO.File.ReadAllText(filepath);
+                }
+                else
+                {
+                    MessageBox.Show("Image not found");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return result;
+        }
+
         public static FileResult<T> ReadCsv<T>(string filepath)
         {
             FileResult<T> result = new FileResult<T>();
