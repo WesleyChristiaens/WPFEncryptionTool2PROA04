@@ -311,6 +311,22 @@ namespace WPFEncryptionTool2PROA04
             return key;
             
         }
+
+        public static string GetKey(string foldername, string selectedkey)
+        {
+           try
+            {    
+                string folderpath = FileHelper.GetFolderPath(foldername);              
+                return FileHelper.ReadStringFromCsv(Path.Combine(foldername, selectedkey));
+            }
+            catch (Exception ex)
+            {                
+                MessageBox.Show(ex.Message);
+            }
+
+            return null;          
+
+        }
     }
 }
 
