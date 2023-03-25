@@ -12,17 +12,17 @@
                 <Label Content="RSA - Encryption" FontSize="26" FontWeight="Bold"></Label>
                 <WrapPanel Margin="0 0 0 40">
                     <Label Content="Select public RSA-key:" Width="155"></Label>
-                    <ComboBox x:Name="CboPublicKeys" Width="200"/>
+                    <ComboBox x:Name="CboRSAKey" Width="200"/>
                 </WrapPanel>
                 <WrapPanel Margin="0 0 0 40">
                     <Label Content="Select AES-key to encrypt:"></Label>
-                    <ComboBox x:Name="CboRSAKeys" Width="200" Margin="10 0 0 0"></ComboBox>
+                    <ComboBox x:Name="CboAESKey" Width="200" Margin="10 0 0 0"></ComboBox>
                 </WrapPanel>
             </StackPanel>
         </WrapPanel>
         <WrapPanel Height="50" VerticalAlignment="Bottom" Margin="10">
             <Label Content="Save encrypted RSA-key as:" FontWeight="Bold"></Label>
-            <TextBox Width="200" x:Name="TxtFileName" FontSize="14"></TextBox>
+            <TextBox Width="200" x:Name="TxtSaveEncryptedAESKeyAs" FontSize="14"></TextBox>
             <Button x:Name="BtnCancel" Width="100" Content="cancel" Margin="205 0 0 0" FontWeight="Bold" Click="BtnEncrypt_Click"/>
             <Button x:Name="BtnEncrypt" Width="100" Content="Encrypt" Margin="420 -25 0 0" FontWeight="Bold" Click="BtnEncrypt_Click"></Button>
         </WrapPanel>
