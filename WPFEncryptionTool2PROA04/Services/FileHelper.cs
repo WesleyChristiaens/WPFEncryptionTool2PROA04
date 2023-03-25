@@ -110,22 +110,19 @@ namespace WPFEncryptionTool2PROA04
         public static string ReadStringFromCsv(string filepath)
         {
             string result = "";
+
             try
             {
                 if (filepath != "")
                 {
                     result = System.IO.File.ReadAllText(filepath);
-                }
-                else
-                {
-                    MessageBox.Show("Image not found");
-                }
+                }               
             }
             catch (Exception)
             {
-
                 throw;
             }
+            
             return result;
         }
 
@@ -204,19 +201,19 @@ namespace WPFEncryptionTool2PROA04
 
         }
 
-        public static SaveResult StoreAesKey(AesKey generatedKey)
+        public static SaveResult StoreAesKey(string foldername, AesKey key)
         {
             SaveResult result = new SaveResult();
 
             try
             {
-                var path = GetFolderPath(Folders.GeneratedAESKeys);
+                var path = GetFolderPath(foldername);
 
                 if (!string.IsNullOrEmpty(path))
                 {
-                    if (!GetDirectoryContent(path).ToList().Contains(generatedKey.Name))
+                    if (!GetDirectoryContent(path).ToList().Contains(key.Name))
                     {
-                        WriteCsv<AesKey>(generatedKey, Path.Combine(path, generatedKey.Name));
+                        WriteCsv<AesKey>(key, Path.Combine(path, key.Name));
                         result.Succeeded = true;
                     }
                     else

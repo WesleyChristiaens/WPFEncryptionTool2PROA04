@@ -121,6 +121,11 @@ namespace WPFEncryptionTool2PROA04
             var path = Path.Combine(FileHelper.GetFolderPath(Folders.AESEncryptedImages), CboImages.SelectedItem.ToString());
             string encryptedImage = FileHelper.ReadStringFromCsv(path);
 
+            if (string.IsNullOrEmpty(encryptedImage))
+            {
+                MessageBox.Show("Image not found");                
+            }
+
             return Convert.FromBase64String(encryptedImage);
         }
 
