@@ -50,7 +50,7 @@ namespace WPFEncryptionTool2PROA04
             if (ValidateTextBoxinput(TxtName.Text))
             {
                 var aesKey = Keygen.GenerateNewAESKey(TxtName.Text);
-                ShowOperationResult(FileHelper.StoreAesKey(aesKey));
+                ShowOperationResult(FileHelper.StoreAesKey(Folders.GeneratedAESKeys,aesKey));
             }          
         }
 
