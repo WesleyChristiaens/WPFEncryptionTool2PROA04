@@ -8,6 +8,7 @@ namespace WPFEncryptionTool2PROA04.Models
 {
     public class FileResult<T> : SaveResult
     {
+        public T record { get; set; }
         public  IEnumerable<T> records { get; set; }
 
         public FileResult()
