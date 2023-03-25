@@ -23,7 +23,7 @@
         <WrapPanel Height="50" VerticalAlignment="Bottom" Margin="10">
             <Label Content="Save encrypted RSA-key as:" FontWeight="Bold"></Label>
             <TextBox Width="200" x:Name="TxtSaveEncryptedAESKeyAs" FontSize="14"></TextBox>
-            <Button x:Name="BtnCancel" Width="100" Content="cancel" Margin="205 0 0 0" FontWeight="Bold" Click="BtnEncrypt_Click"/>
+            <Button x:Name="BtnCancel" Width="100" Content="cancel" Margin="205 0 0 0" FontWeight="Bold" Click="BtnCancel_Click"/>
             <Button x:Name="BtnEncrypt" Width="100" Content="Encrypt" Margin="420 -25 0 0" FontWeight="Bold" Click="BtnEncrypt_Click"></Button>
         </WrapPanel>
     </Grid>
