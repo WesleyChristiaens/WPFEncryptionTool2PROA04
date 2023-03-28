@@ -85,6 +85,9 @@
     <Compile Include="Models\EncryptedImage.cs" />
     <Compile Include="Models\Key.cs" />
     <Compile Include="Models\SaveResult.cs" />
+    <Compile Include="RSA_Encryption.xaml.cs">
+      <DependentUpon>RSA_Encryption.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\FileHelper.cs" />
     <Compile Include="Services\Folders.cs" />
     <Compile Include="Services\Keygen.cs" />
@@ -98,6 +101,10 @@
     <Compile Include="WpfOptions.xaml.cs">
       <DependentUpon>WpfOptions.xaml</DependentUpon>
     </Compile>
+    <Page Include="RSA_Encryption.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="WpfAesDecryption.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -106,11 +113,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="RSA_Decryption.xaml.cs">
-      <DependentUpon>RSA_Decryption.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="RSA_Encryption.xaml.cs">
-      <DependentUpon>RSA_Encryption.xaml</DependentUpon>
+    <Compile Include="WpfRSA_Decryption.xaml.cs">
+      <DependentUpon>WpfRSA_Decryption.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -127,14 +131,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="RSA_Decryption.xaml">
+    <Page Include="WpfRSA_Decryption.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RSA_Encryption.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-	</Page>
     <Page Include="WpfOptions.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

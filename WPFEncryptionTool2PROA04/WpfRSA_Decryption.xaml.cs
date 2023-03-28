@@ -19,9 +19,9 @@ namespace WPFEncryptionTool2PROA04
     /// <summary>
     /// Interaction logic for RSA_Decryption.xaml
     /// </summary>
-    public partial class RSA_Decryption : Window
+    public partial class WpfRSA_Decryption : Window
     {
-        public RSA_Decryption()
+        public WpfRSA_Decryption()
         {
             InitializeComponent();
             LoadComboboxes();
@@ -39,16 +39,28 @@ namespace WPFEncryptionTool2PROA04
             {
                 try
                 {
-                    //get encrypted AESkey from file
-                    string aesKey = FileHelper.GetKey(Folders.RSAEncryptedAESKeys, CboAESKeys.SelectedItem.ToString());
 
-                    //get private RSA key from file
-                    string rsaKey = FileHelper.GetKey(Folders.RSAPrivateKeys, CboprivateRSAKeys.SelectedItem.ToString());
-
-                    //decrypt AESkey using RSA private key   
-                    using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+                    using (var rsa = new RSACryptoServiceProvider(1024))
                     {
-                        // https://t-phitakgul.medium.com/c-rsa-encryption-decryption-with-my-own-key-dab2d1f4df1b
+                        try
+                        {
+                            var base64Encrypted = File.ReadAllText(Path.Combine
+                                (Folders.RSAEncryptedAESKeys, CboAESKeys.SelectedItem.ToString()));
+
+                            // server decrypting data with private key                    
+                            rsa.FromXmlString(File.ReadAllText(
+                                Path.Combine(
+                                    Folders.RSAPrivateKeys, CboprivateRSAKeys.SelectedItem.ToString())));
+
+                            var resultBytes = Convert.FromBase64String(base64Encrypted);
+                            var decryptedBytes = rsa.Decrypt(resultBytes, true);
+                            var decryptedData = Encoding.UTF8.GetString(decryptedBytes);
+                            decryptedData.ToString();
+                        }
+                        finally
+                        {
+                            rsa.PersistKeyInCsp = false;
+                        }
                     }
 
                     //write decrypted AES-key to file
@@ -61,7 +73,7 @@ namespace WPFEncryptionTool2PROA04
                 {
                     MessageBox.Show(ex.Message);
                 }
-            }            
+            }
         }
 
         private void StoreDecryptedKey(AesKey decryptedkey)
@@ -92,11 +104,11 @@ namespace WPFEncryptionTool2PROA04
 
             if (folderContent.Count() > 0)
             {
-                cbo.ItemsSource = FileHelper.GetDirectoryContent(path);
+                cbo.ItemsSource = FileHelper.GetDirectoryContent(path);                
             }
             else
             {
-                cbo.Items.Add("no keys generated");
+                cbo.Items.Add("no keys available");
                 cbo.SelectedIndex = 0;
             }
 
