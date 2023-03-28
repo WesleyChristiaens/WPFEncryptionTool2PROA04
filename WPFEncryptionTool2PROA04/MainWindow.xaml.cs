@@ -50,14 +50,12 @@ namespace WPFEncryptionTool2PROA04
             if (ValidateTextBoxinput(TxtName.Text))
             {
                 var aesKey = Keygen.GenerateNewAESKey(TxtName.Text);
-                ShowOperationResult(FileHelper.StoreAesKey(Folders.GeneratedAESKeys,aesKey));
-            }          
+                ShowOperationResult(FileHelper.StoreAesKey(Folders.GeneratedAESKeys, aesKey));
+            }
         }
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+         => new WpfRSA_Decryption().ShowDialog();
 
         private void AESDecrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -72,11 +70,7 @@ namespace WPFEncryptionTool2PROA04
         }
 
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-
+        => new RSA_Encryption().ShowDialog();
 
         private bool ValidateTextBoxinput(string input)
         {
