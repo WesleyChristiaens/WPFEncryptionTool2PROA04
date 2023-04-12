@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using WPFEncryptionTool2PROA04.Models;
 using Image = System.Drawing.Image;
 
 namespace WPFEncryptionTool2PROA04
@@ -19,50 +17,35 @@ namespace WPFEncryptionTool2PROA04
         public WpfAesDecryption()
         {
             InitializeComponent();
-            LoadCbo();
-            LoadImagesCbo();
+            LoadComboBoxes();
         }
 
-        private void LoadCbo()
+        private void LoadComboBoxes()
         {
-            CboAESKeys.Items.Clear();
-
-            var path = FileHelper.GetFolderPath(Folders.GeneratedAESKeys);
-            var folderContent = FileHelper.GetDirectoryContent(path);
-
-            if (folderContent.Count() > 0)
-            {
-                CboAESKeys.ItemsSource = FileHelper.GetDirectoryContent(path);
-            }
-            else
-            {
-                CboAESKeys.Items.Add("no keys generated");
-                CboAESKeys.SelectedIndex = 0;
-            }
+            LoadCbo(CboAESKeys, DefaultFolders.GeneratedAesKeys);
+            LoadCbo(CboImages, DefaultFolders.AesEncryptedImages);
         }
 
-        private void LoadImagesCbo()
+        private void LoadCbo(ComboBox cbo, string folderpath)
         {
-            CboImages.Items.Clear();
+            cbo.Items.Clear();
 
-            var path = FileHelper.GetFolderPath(Folders.AESEncryptedImages);
-            var folderContent = FileHelper.GetDirectoryContent(path);
+            var folderContent = new FileHelper()
+                .WithFolder(folderpath)
+                .GetDirectoryContent().ToList();
 
-            if (folderContent.Count() > 0)
+            if (!folderContent.Any())
             {
-                CboImages.ItemsSource = FileHelper.GetDirectoryContent(path);
+                cbo.Items.Add("no keys generated");
+                cbo.SelectedIndex = 0;
+                return;
             }
-            else
-            {
-                CboImages.Items.Add("no encrypted images found");
-                CboImages.SelectedIndex = 0;
-            }
+
+            cbo.ItemsSource = folderContent;
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+            => this.Close();
 
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -73,16 +56,13 @@ namespace WPFEncryptionTool2PROA04
                     MessageBox.Show("Select an AES key to decrypt");
                     return;
                 }
+
                 if (CboImages.SelectedIndex == -1 || CboImages.SelectedIndex.ToString() == "no encrypted images found")
                 {
                     MessageBox.Show("Select an image to decrypt");
                     return;
                 }
-                if (String.IsNullOrEmpty(FileHelper.GetFolderPath(Folders.Images)))
-                {
-                    MessageBox.Show("Please set standard folders first");
-                    return;
-                }
+
                 if (String.IsNullOrEmpty(TxtFileName.Text))
                 {
                     MessageBox.Show("Please specify file name");
@@ -90,22 +70,40 @@ namespace WPFEncryptionTool2PROA04
                 }
 
                 var encryptedImage = getImage();
-                var selectedkey = CboAESKeys.SelectedItem.ToString();
-                AesKey aesKey = FileHelper.GetAesKey(Folders.GeneratedAESKeys, selectedkey);
-                var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey);
+
+                string[] aesCredentials = new FileHelper()
+                    .WithFolder(DefaultFolders.GeneratedAesKeys)
+                    .WithFileName(CboAESKeys.SelectedItem.ToString())
+                    .ReadFromFile().Content.Split(';');
+
+                string aesKey = aesCredentials[0];
+                string aesIv = aesCredentials[1];
+
+                var decryptedImage = DecryptStringFromBytes_Aes(encryptedImage, aesKey, aesIv);
+
                 SaveImage(decryptedImage);
-                MessageBox.Show("Your image has been decrypted succesfully");
+               
             }
             catch (CryptographicException ex)
             {
                 MessageBox.Show(ex.Message);
             }
+
+            MessageBox.Show($"Your image has been decrypted succesfully, and can be found at {DefaultFolders.Images}");
+            this.Close();
         }
 
         private void SaveImage(byte[] imageByteArray)
         {
-            string folderPath = FileHelper.GetFolderPath(Folders.Images);
-            string filePath = Path.Combine(folderPath, TxtFileName.Text);
+            if (string.IsNullOrEmpty(DefaultFolders.Images))
+            {
+                MessageBox.Show($"Please set standard folder for {nameof(DefaultFolders.Images)} first.");
+                var wpf = new WpfOptions();
+                wpf.ShowDialog();
+            }
+
+            string filePath = Path.Combine(DefaultFolders.Images, TxtFileName.Text);
+
             using (Image image = Image.FromStream(new MemoryStream(imageByteArray)))
             {
                 image.Save(filePath + ".jpg", ImageFormat.Jpeg);
@@ -117,32 +115,44 @@ namespace WPFEncryptionTool2PROA04
 
         private byte[] getImage()
         {
-            
-            var path = Path.Combine(FileHelper.GetFolderPath(Folders.AESEncryptedImages), CboImages.SelectedItem.ToString());
-            string encryptedImage = FileHelper.ReadStringFromCsv(path);
+            string encryptedImage = new FileHelper()
+                .WithFolder(DefaultFolders.AesEncryptedImages)
+                .WithFileName(CboImages.SelectedItem.ToString())
+                .ReadFromFile().Content;
+
+            if (string.IsNullOrEmpty(encryptedImage))
+            {
+                MessageBox.Show("Image not found");
+            }
 
             return Convert.FromBase64String(encryptedImage);
         }
 
-        static byte[] DecryptStringFromBytes_Aes(byte[] cipherText, AesKey aesKey)
+        static byte[] DecryptStringFromBytes_Aes(byte[] cipherText, string aesKey, string aesIv)
         {
             // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
-            if (aesKey.Key == null || aesKey.Key.Length <= 0)
+            if (aesKey == null || aesKey.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (aesKey.InitiationVector == null || aesKey.InitiationVector.Length <= 0)
+            if (aesIv == null || aesIv.Length <= 0)
                 throw new ArgumentNullException("IV");
 
+            // Declare the string used to hold
+            // the decrypted text.
             string plaintext = null;
 
+            // Create an Aes object
+            // with the specified key and IV.
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Convert.FromBase64String(aesKey.Key);
-                aesAlg.IV = Convert.FromBase64String(aesKey.InitiationVector);
+                aesAlg.Key = Convert.FromBase64String(aesKey);
+                aesAlg.IV = Convert.FromBase64String(aesIv);
 
+                // Create a decryptor to perform the stream transform.
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
+                // Create the streams used for decryption.
                 using (MemoryStream msDecrypt = new MemoryStream(cipherText))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
