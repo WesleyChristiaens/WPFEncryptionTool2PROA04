@@ -1,144 +1,121 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using WPFEncryptionTool2PROA04.Models;
+using System.Windows.Forms;
+using ComboBox = System.Windows.Controls.ComboBox;
+using MessageBox = System.Windows.MessageBox;
 
 namespace WPFEncryptionTool2PROA04
 {
     /// <summary>
     /// Interaction logic for RSA_Decryption.xaml
     /// </summary>
-    public partial class WpfRSA_Decryption : Window
+    public partial class WpfRsaDecryption : Window
     {
-        public WpfRSA_Decryption()
+        public IEnumerable AesKeys { get; set; }
+
+        public WpfRsaDecryption()
         {
             InitializeComponent();
             LoadComboboxes();
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+            => this.Close();
 
 
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
-            if (ValidateInput())
+            var converter = new UnicodeEncoding();
+
+            byte[] dataToDecrypt = converter.GetBytes
+            (
+                new FileHelper()
+                    .WithFolder(DefaultFolders.RsaEncryptedAesKeys)
+                    .WithFileName(CboAesKeys.SelectedItem.ToString())
+                    .ReadFromFile().Content
+            );
+
+            try
             {
-                try
+                byte[] decryptedData;
+
+                using (var rsa = new RSACryptoServiceProvider())
                 {
+                    rsa.FromXmlString
+                    (
+                        new FileHelper()
+                            .WithFolder(DefaultFolders.RsaPrivateKeys)
+                            .WithFileName(CboPrivateRsaKeys.SelectedItem.ToString())
+                            .ReadFromFile().Content
+                    );
 
-                    using (var rsa = new RSACryptoServiceProvider(1024))
-                    {
-                        try
-                        {
-                            var base64Encrypted = File.ReadAllText(Path.Combine
-                                (Folders.RSAEncryptedAESKeys, CboAESKeys.SelectedItem.ToString()));
-
-                            // server decrypting data with private key                    
-                            rsa.FromXmlString(File.ReadAllText(
-                                Path.Combine(
-                                    Folders.RSAPrivateKeys, CboprivateRSAKeys.SelectedItem.ToString())));
-
-                            var resultBytes = Convert.FromBase64String(base64Encrypted);
-                            var decryptedBytes = rsa.Decrypt(resultBytes, true);
-                            var decryptedData = Encoding.UTF8.GetString(decryptedBytes);
-                            decryptedData.ToString();
-                        }
-                        finally
-                        {
-                            rsa.PersistKeyInCsp = false;
-                        }
-                    }
-
-                    //write decrypted AES-key to file
-                    AesKey decryptedkey = new AesKey();
-
-                    StoreDecryptedKey(decryptedkey);
-
+                    decryptedData = rsa.Decrypt(dataToDecrypt, true);
                 }
-                catch (CryptographicException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-        }
 
-        private void StoreDecryptedKey(AesKey decryptedkey)
-        {
-            var saveresult = FileHelper.StoreAesKey(Folders.DecryptedAESKeys, decryptedkey);
-            if (saveresult.Succeeded)
-            {
-                MessageBox.Show("Decryption was succesfull");
+                new FileHelper()
+                    .WithFolder(DefaultFolders.DecryptedAesKeys)
+                    .WithFileName(TxtFileName.Text)
+                    .WithContent(Convert.ToBase64String(decryptedData))
+                    .SaveToFile();
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(saveresult.Errors.ToString());
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void LoadComboboxes()
         {
-            LoadCbo(CboAESKeys, Folders.RSAEncryptedAESKeys);
-            LoadCbo(CboprivateRSAKeys, Folders.RSAPrivateKeys);
+            LoadCbo(CboAesKeys, DefaultFolders.RsaEncryptedAesKeys);
+            LoadCbo(CboPrivateRsaKeys, DefaultFolders.RsaPrivateKeys);
         }
 
-        private void LoadCbo(ComboBox cbo, string folder)
+        private void LoadCbo(ComboBox cbo, string folderpath)
         {
             cbo.Items.Clear();
 
-            var path = FileHelper.GetFolderPath(folder);
-            var folderContent = FileHelper.GetDirectoryContent(path);
+            var folderContent = new FileHelper()
+                .WithFolder(folderpath)
+                .GetDirectoryContent().ToList();
 
-            if (folderContent.Count() > 0)
+            if (!folderContent.Any())
             {
-                cbo.ItemsSource = FileHelper.GetDirectoryContent(path);                
-            }
-            else
-            {
-                cbo.Items.Add("no keys available");
+                cbo.Items.Add("no keys generated");
                 cbo.SelectedIndex = 0;
+                return;
             }
 
+            cbo.ItemsSource = folderContent;
         }
 
         private bool ValidateInput()
-        {          
-            if (CboprivateRSAKeys.SelectedIndex == -1 || CboprivateRSAKeys.SelectedIndex.ToString() == "no keys generated")
+        {
+            if (CboPrivateRsaKeys.SelectedIndex == -1 ||
+                CboPrivateRsaKeys.SelectedIndex.ToString() == "no keys generated")
             {
                 MessageBox.Show("Select a private RSA key to decrypt");
                 return false;
-                
             }
-            if (CboAESKeys.SelectedIndex == -1 || CboAESKeys.SelectedIndex.ToString() == "no encrypted images found")
+
+            if (CboAesKeys.SelectedIndex == -1 || CboAesKeys.SelectedIndex.ToString() == "no encrypted images found")
             {
                 MessageBox.Show("Select an image to decrypt");
                 return false;
             }
-            if (String.IsNullOrEmpty(FileHelper.GetFolderPath(Folders.DecryptedAESKeys)))
-            {
-                MessageBox.Show($"No folder set for '{nameof(Folders.DecryptedAESKeys)}'");
-                return false;
-            }
+
             if (String.IsNullOrEmpty(TxtFileName.Text))
             {
                 MessageBox.Show("Please specify file name");
                 return false;
             }
 
-            return true;            
+            return true;
         }
     }
 }
