@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using WPFEncryptionTool2PROA04.Models;
+using System.Xml.Linq;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -16,23 +13,71 @@ namespace WPFEncryptionTool2PROA04
         public WpfOptions()
         {
             InitializeComponent();
+            LoadTextBoxes();
         }
 
-        
+        private void LoadTextBoxes()
+        {
+            FolderStack.Children.Clear();
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {                        
-            SetContentOfTextBoxes(ReadFolderIndex());            
+            foreach (var folder in DefaultFolders.FolderList)
+            {
+                FolderStack.Children.Add(CreateFolderPanel(folder.Key, folder.Value));
+            }
         }
+
+        private WrapPanel CreateFolderPanel(string name,string folderpath)
+        {
+            WrapPanel wp = new WrapPanel();
+            wp.Margin= new Thickness(0,5,0,5);
+            wp.HorizontalAlignment = HorizontalAlignment.Right;
+
+            Label lbl = new Label();
+            lbl.Content = name;
+
+            wp.Children.Add(lbl);
+
+            TextBox tb = new TextBox();
+            tb.Name = $"Txt{name}";
+            tb.Text = folderpath;
+            tb.Width = 300;
+            tb.Margin = new Thickness(5,0,5,0);
+            tb.LostFocus += Tb_LostFocus;
+
+            wp.Children.Add(tb);
+
+            Button btn = new Button();
+            btn.Name= $"Btn{name}";
+            btn.Content = "...";
+            btn.Width = 25;
+            btn.Click += FolderSelectBtn_Click;
+
+            wp.Children.Add(btn);
+
+            return wp;
+
+        }
+
+        private void Tb_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            var prop = typeof(DefaultFolders).GetProperty(tb.Name.Remove(0, 3));
+            prop.SetValue(prop,tb.Text);
+        }       
+
         private void FolderSelectBtn_Click(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            var fbd = new System.Windows.Forms.FolderBrowserDialog();
+            Button btn = sender as Button;
+            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();  
+            WrapPanel panel = btn.Parent as WrapPanel;
+            TextBox tb = panel.Children[1] as TextBox;
+
             fbd.ShowDialog();
 
             if (fbd.SelectedPath.Any())
             {
-                ShowSelectedFolder(btn.Name,fbd.SelectedPath);
+                tb.Text = fbd.SelectedPath;
+                tb.Focus();
             }
 
         }
@@ -44,133 +89,17 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-
-            SaveFolders();
-
-        }
-
-        private void SaveFolders()
-        {
-            var result = FileHelper.WriteCsv(GetContentOfTextBoxes(), Folders.FolderIndex);
-            MessageBoxResult message;
-
-            if (result.Succeeded)
+            if (DefaultFolders.SaveToFile())
             {
-                message = MessageBox.Show("Folders stored succesfully", "Success", MessageBoxButton.OK);
+                MessageBox.Show("Folders succesfully saved");
+                this.Close();
             }
             else
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (var item in result.Errors)
-                {
-                    sb.AppendLine(item);
-                }
-
-                message = MessageBox.Show($"{sb.ToString()}", "Error", MessageBoxButton.OK);
+                MessageBox.Show($"Something went wrong saving the folderpaths, please check {DefaultFolders.FolderIndex}.");
             }
-
-            if (message == MessageBoxResult.OK)
-            { 
-                this.Close(); 
-            }
-        }
-
-        private IEnumerable<Folder> GetContentOfTextBoxes()
-        {
-            //Reads the content of all the textboxes to a List
-            List<Folder> lst = new List<Folder>();
-
-            foreach (var child in Stack.Children)
-            {
-                if (child.GetType().Equals(typeof(WrapPanel)))
-                {
-                    var panel = child as WrapPanel;
-
-                    foreach (var element in panel.Children)
-                    {
-                        if (element.GetType().Equals(typeof(TextBox)))
-                        {
-                            var textbox = element as TextBox;
-
-                            lst.Add(new Folder() { Name = textbox.Name.Substring(3), Path = textbox.Text });
-
-                        }
-                    }
-                }
-            }
-
-            return lst;
-        }
-
-        private void SetContentOfTextBoxes(IEnumerable<Folder> folders)
-        {
-            foreach (var child in Stack.Children)
-            {
-                if (child.GetType().Equals(typeof(WrapPanel)))
-                {
-                    var panel = child as WrapPanel;
-
-                    foreach (var element in panel.Children)
-                    {
-                        if (element.GetType().Equals(typeof(TextBox)))
-                        {
-                            var textbox = element as TextBox;
-
-                            foreach (var folder in folders)
-                            {
-                                if ($"Txt{folder.Name}" == textbox.Name)
-                                {
-                                    textbox.Text = folder.Path;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private IEnumerable<Folder> ReadFolderIndex()
-        {
-            IEnumerable<Folder> lst = new List<Folder>();
-            
-            if (File.ReadAllText(Folders.FolderIndex) != string.Empty)
-            {
-                lst = FileHelper.ReadCsv<Folder>(Folders.FolderIndex).records;
-            }
-
-            return lst.ToList();
-        }
-
-        private void ShowSelectedFolder(string btnName,string selectedPath)
-        {
-            switch (btnName)
-            {
-                case "BtnGeneratedAESKeys":
-                    TxtGeneratedAESKeys.Text = selectedPath;
-                    break;
-                case "BtnDecryptedAESKeys":
-                    TxtDecryptedAESKeys.Text = selectedPath;
-                    break;
-                case "BtnRSAEncryptedAESKeys":
-                    TxtRSAEncryptedAESKeys.Text = selectedPath;
-                    break;
-                case "BtnAESEncryptedImages":
-                    TxtAESEncryptedImages.Text = selectedPath;
-                    break;
-                case "BtnImages":
-                    TxtImages.Text = selectedPath;
-                    break;
-                case "BtnRSAPublicKeys":
-                    TxtRSAPublicKeys.Text = selectedPath;
-                    break;
-                case "BtnRSAPrivateKeys":
-                    TxtRSAPrivateKeys.Text = selectedPath;
-                    break;
-                default:
-                    break;
-            }
-        }
-
+           
+        }             
 
     }
 }

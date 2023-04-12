@@ -82,19 +82,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\EncryptedImage.cs" />
-    <Compile Include="Models\Key.cs" />
-    <Compile Include="Models\SaveResult.cs" />
     <Compile Include="RSA_Encryption.xaml.cs">
       <DependentUpon>RSA_Encryption.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\FileHelper.cs" />
-    <Compile Include="Services\Folders.cs" />
+    <Compile Include="Services\DefaultFolders.cs" />
     <Compile Include="Services\Keygen.cs" />
-    <Compile Include="Models\AesKey.cs" />
-    <Compile Include="Models\FileResult.cs" />
-    <Compile Include="Models\Folder.cs" />
-    <Compile Include="Models\RsaKeyPair.cs" />
     <Compile Include="WpfAesDecryption.xaml.cs">
       <DependentUpon>WpfAesDecryption.xaml</DependentUpon>
     </Compile>
@@ -167,5 +160,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

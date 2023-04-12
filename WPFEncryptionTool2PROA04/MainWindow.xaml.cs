@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Windows;
-using WPFEncryptionTool2PROA04.Models;
 
 namespace WPFEncryptionTool2PROA04
 {
@@ -14,63 +13,77 @@ namespace WPFEncryptionTool2PROA04
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!File.Exists(Folders.FolderIndex))
-            {
-                var file = File.Create(Folders.FolderIndex);
-                file.Close();
-            }
+            DefaultFolders.Load();
         }
 
         private void MnuOptions_Click(object sender, RoutedEventArgs e)
-        {
-            var wpf = new WpfOptions();
-            wpf.ShowDialog();
-        }
+            => new WpfOptions().ShowDialog();
 
         private void MnuClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+            => this.Close();
 
         private void BtnGenerateRSA_Click(object sender, RoutedEventArgs e)
         {
-            if (ValidateTextBoxinput(TxtName.Text))
+            if (!ValidateTextBoxinput(TxtName.Text))
             {
-                var rkp = Keygen.GenerateNewRSaKeypair(TxtName.Text);
-                ShowOperationResult(FileHelper.StoreRSAKeyPair(rkp));
+                return;
             }
+
+            try
+            {
+                Keygen.GenerateNewRSaKeypair(TxtName.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            MessageBox.Show(
+                $"RsaKeypair successfully generated" +
+                $"{Environment.NewLine}" +
+                $" @{DefaultFolders.RsaPublicKeys} &" +
+                $"{Environment.NewLine}" +
+                $" {DefaultFolders.RsaPrivateKeys}");
+
+            TxtName.Text = string.Empty;
         }
 
         private void BtnGenerateAES_Click(object sender, RoutedEventArgs e)
         {
-            if (ValidateTextBoxinput(TxtName.Text))
+            if (!ValidateTextBoxinput(TxtName.Text))
             {
-                var aesKey = Keygen.GenerateNewAESKey(TxtName.Text);
-                ShowOperationResult(FileHelper.StoreAesKey(Folders.GeneratedAESKeys, aesKey));
+                return;
             }
+
+            try
+            {
+                Keygen.GenerateNewAESKey(TxtName.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            MessageBox.Show(
+                $"AesKey successfully generated" +
+                $"{Environment.NewLine}" +
+                $"@{DefaultFolders.GeneratedAesKeys}");
+
+            
         }
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
-         => new WpfRSA_Decryption().ShowDialog();
+            => new WpfRsaDecryption().ShowDialog();
 
         private void AESDecrypt_Click(object sender, RoutedEventArgs e)
-        {
-            var wpf = new WpfAesDecryption();
-            wpf.ShowDialog();
-        }
+            => new WpfAesDecryption().ShowDialog();
+
 
         private void AESEncrypt_Click(object sender, RoutedEventArgs e)
-        {
-            var wpf = new WpfAesEncryption();
-            wpf.ShowDialog();
-        }
+            => new WpfAesEncryption().ShowDialog();
 
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
-        => new RSA_Encryption().ShowDialog();
+            => new RSA_Encryption().ShowDialog();
 
         private bool ValidateTextBoxinput(string input)
         {
@@ -89,34 +102,6 @@ namespace WPFEncryptionTool2PROA04
             }
 
             return validation;
-
         }
-
-        private void ShowOperationResult(SaveResult result)
-        {
-            if (result.Succeeded)
-            {
-                MessageBox.Show("Key succesfully generated", "Operation succesfull", MessageBoxButton.OK);
-            }
-            else
-            {
-                var sb = new StringBuilder();
-                foreach (var item in result.Errors)
-                {
-                    sb.AppendLine(item);
-                    sb.Append(Environment.NewLine);
-                }
-
-                MessageBox.Show($"{sb.ToString()}", "Error", MessageBoxButton.OK);
-            }
-        }
-
-
-
-
-
-
-
-
     }
 }
