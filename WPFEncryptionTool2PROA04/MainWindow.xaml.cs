@@ -69,7 +69,10 @@ namespace WPFEncryptionTool2PROA04
                $"{Environment.NewLine}" +
                $"@{DefaultFolders.GeneratedAesKeys}");
 
-            private void AESEncrypt_Click(object sender, RoutedEventArgs e)
+            TxtName.Text = string.Empty;
+        }
+
+        private void AESEncrypt_Click(object sender, RoutedEventArgs e)
         {
             var wpf = new WpfAesEncryption();
             wpf.ShowDialog();
@@ -80,7 +83,14 @@ namespace WPFEncryptionTool2PROA04
         }
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
-            => new WpfRsaDecryption().ShowDialog();
+        {
+            var wpf = new WpfRsaDecryption();
+            wpf.ShowDialog();
+            if (LblDecrypt.Content.ToString() == "Decrypt: AES key is decrypted")
+            {
+                AESDecrypt.IsEnabled = true;
+            }
+        }
 
         private void AESDecrypt_Click(object sender, RoutedEventArgs e)
             => new WpfAesDecryption().ShowDialog();
@@ -88,7 +98,14 @@ namespace WPFEncryptionTool2PROA04
 
 
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
-            => new RSA_Encryption().ShowDialog();
+        {
+            var wpf = new RSA_Encryption();
+            wpf.ShowDialog();
+            if (LblEncrypt.Content.ToString() == "Encrypt: AES key is encrypted")
+            {
+                RSADecrypt.IsEnabled = true;
+            }
+        }
 
         private bool ValidateTextBoxinput(string input)
         {

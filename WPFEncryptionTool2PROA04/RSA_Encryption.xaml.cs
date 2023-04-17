@@ -1,66 +1,53 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 
 namespace WPFEncryptionTool2PROA04
 {
-    /// <summary>
-    /// Interaction logic for RSA_Encryption.xaml
-    /// </summary>
     public partial class RSA_Encryption : Window
     {
-
-        public static string rsaKey = "MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\r\nKUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\r\no3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\r\nTQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\r\n9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\r\nv/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\r\n/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00";
-        public static string aesKey = "taDyfoLsljNYkUdlj44wcw==";
-
-        UnicodeEncoding ByteConverter = new UnicodeEncoding();
-        RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-        byte[] plaintext;
-        byte[] encryptedtext;
-
         public RSA_Encryption()
         {
             InitializeComponent();
+            LoadCbo();
         }
 
-        #region --- HELPERS ---
-
-        static public string EncodeToBase64(string toEncode)
-
+        private void LoadCbo()
         {
+            CboAESKey.Items.Clear();
+            CboRSAKey.Items.Clear();
 
-            byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode);
+            //opvullen combobox AES keys
+            var folderContentAESKeys = new FileHelper()
+                .WithFolder(DefaultFolders.GeneratedAesKeys)
+                .GetDirectoryContent().ToList();
 
-            string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
-
-            return returnValue;
-
-        }
-        #endregion
-
-
-        // function for Encryption.
-        static public byte[] Encryption(byte[] Data, RSAParameters RSAKey, bool DoOAEPPadding)
-        {
-            try
+            if (!folderContentAESKeys.Any())
             {
-                byte[] encryptedData;
-                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
-                {
-                    RSA.ImportParameters(RSAKey);
-                    encryptedData = RSA.Encrypt(Data, DoOAEPPadding);
-                }
-                return encryptedData;
+                CboAESKey.Items.Add("no keys generated");
+                CboAESKey.SelectedIndex = 0;
+                return;
             }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-        }
 
+            CboAESKey.ItemsSource = folderContentAESKeys;
+
+            //opvullen combobox public RSA keys
+            var folderContentRSAKeys = new FileHelper()
+                .WithFolder(DefaultFolders.RsaPublicKeys)
+                .GetDirectoryContent().ToList();
+
+            if (!folderContentRSAKeys.Any())
+            {
+                CboRSAKey.Items.Add("no keys generated");
+                CboRSAKey.SelectedIndex = 0;
+                return;
+            }
+
+            CboRSAKey.ItemsSource = folderContentRSAKeys;
+        }
 
         private void BtnEncrypt_Click(object sender, RoutedEventArgs e)
         {
@@ -68,38 +55,52 @@ namespace WPFEncryptionTool2PROA04
             {
                 if (CboAESKey.SelectedIndex != -1 || CboRSAKey.SelectedIndex != -1)
                 {
+                    string aesCredentials = new FileHelper()
+                        .WithFolder(DefaultFolders.GeneratedAesKeys)
+                        .WithFileName(CboAESKey.SelectedItem.ToString() + ".txt")
+                        .ReadFromFile();
 
-                    if (TxtSaveEncryptedAESKeyAs.Text != "")
-                    {
-                        //byte[] Rsakey = Convert.FromBase64String(CboRSAKey.SelectedValue.ToString());
-                        byte[] base64String = ByteConverter.GetBytes(CboAESKey.SelectedValue.ToString());
-                        byte[] encryptedAesKey = Encryption(base64String, RSA.ExportParameters(false), false);
-                        using (StreamWriter sw = File.CreateText(@"C:\Github Repositories\WPFEncryptionTool2PROA04\AESImages\" + TxtSaveEncryptedAESKeyAs.Text + ".txt")) //dynamic path encrypted RSA
-                        {
-                            sw.WriteLine(encryptedAesKey.ToString());
-                        }
+                    byte[] dataToEncrypt = Encoding.Default.GetBytes(aesCredentials);
+                    byte[] encryptedData;
 
-                        MessageBox.Show("Your AES key has been encrypted succesfully.");
+                    using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+                    {           
+                        RSA.FromXmlString
+                        (
+                            new FileHelper()
+                            .WithFolder(DefaultFolders.RsaPublicKeys)
+                            .WithFileName(CboRSAKey.SelectedItem.ToString() + ".xml")
+                            .IsXmlFile(true)
+                            .ReadFromFile()
+                        );
+                        var param = RSA.ExportParameters(false);
+                        encryptedData = RSA.Encrypt(dataToEncrypt, false);
                     }
-                    else
-                    {
-                        MessageBox.Show("Fill in file name.");
-                    }
+
+                    new FileHelper()
+                        .WithFolder(DefaultFolders.RsaEncryptedAesKeys)
+                        .WithFileName(TxtSaveEncryptedAESKeyAs.Text)
+                        .WithContent(Convert.ToBase64String(encryptedData))
+                        .SaveToFile();
+
                 }
                 else
                 {
                     MessageBox.Show("Please select an public RSA key and AES key to encrypt.");
                 }
-
-
-
             }
             catch (CryptographicException ex)
             {
                 MessageBox.Show(ex.Message);
+                return;
             }
+
+            MessageBox.Show($"Your AES key has been encrypted succesfully, and can be found at {DefaultFolders.RsaEncryptedAesKeys}");
+            ((MainWindow)Application.Current.MainWindow).LblEncrypt.Content = "Encrypt: AES key is encrypted";
+
+            this.Close();
         }
-        
+
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
-using System.Windows.Forms;
 using ComboBox = System.Windows.Controls.ComboBox;
 using MessageBox = System.Windows.MessageBox;
 
@@ -31,15 +30,15 @@ namespace WPFEncryptionTool2PROA04
 
         private void BtnDecrypt_Click(object sender, RoutedEventArgs e)
         {
-            var converter = new UnicodeEncoding();
-
-            byte[] dataToDecrypt = converter.GetBytes
+            string cipherText = 
             (
                 new FileHelper()
                     .WithFolder(DefaultFolders.RsaEncryptedAesKeys)
-                    .WithFileName(CboAesKeys.SelectedItem.ToString())
+                    .WithFileName(CboAesKeys.SelectedItem.ToString() + ".txt")
                     .ReadFromFile()
             );
+
+            byte[] dataToDecrypt = Convert.FromBase64String(cipherText);
 
             try
             {
@@ -51,24 +50,31 @@ namespace WPFEncryptionTool2PROA04
                     (
                         new FileHelper()
                             .WithFolder(DefaultFolders.RsaPrivateKeys)
-                            .WithFileName(CboPrivateRsaKeys.SelectedItem.ToString())
+                            .WithFileName(CboPrivateRsaKeys.SelectedItem.ToString() + ".xml")
                             .IsXmlFile(true)
                             .ReadFromFile()
                     );
 
-                    decryptedData = rsa.Decrypt(dataToDecrypt, true);
+                    decryptedData = rsa.Decrypt(dataToDecrypt, false);
                 }
 
                 new FileHelper()
                     .WithFolder(DefaultFolders.DecryptedAesKeys)
                     .WithFileName(TxtFileName.Text)
-                    .WithContent(Convert.ToBase64String(decryptedData))
+                    .WithContent(Encoding.UTF8.GetString(decryptedData))
                     .SaveToFile();
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                return;
             }
+
+            MessageBox.Show($"Your AES key has been decrypted succesfully, and can be found at {DefaultFolders.DecryptedAesKeys}");
+            ((MainWindow)Application.Current.MainWindow).LblDecrypt.Content = "Decrypt: AES key is decrypted";
+
+            this.Close();
         }
 
         private void LoadComboboxes()

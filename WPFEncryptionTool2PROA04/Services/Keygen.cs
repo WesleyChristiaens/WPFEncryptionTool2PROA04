@@ -11,6 +11,7 @@ namespace WPFEncryptionTool2PROA04
 
             using (Aes aes = Aes.Create())
             {
+                aes.KeySize = 128;
                 key = $"{Convert.ToBase64String(aes.Key)};{Convert.ToBase64String(aes.IV)}";
             }
 

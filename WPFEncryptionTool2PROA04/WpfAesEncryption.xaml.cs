@@ -64,7 +64,7 @@ namespace WPFEncryptionTool2PROA04
                 {
                     string[] aesCredentials = new FileHelper()
                         .WithFolder(DefaultFolders.GeneratedAesKeys)
-                        .WithFileName(CboAESKeys.SelectedItem.ToString())
+                        .WithFileName(CboAESKeys.SelectedItem.ToString() + ".txt")
                         .ReadFromFile().Split(';');
 
                     string aesKey = aesCredentials[0];
@@ -83,8 +83,7 @@ namespace WPFEncryptionTool2PROA04
                     MessageBox.Show(ex.Message);
                 }
 
-                MessageBox.Show(
-                    $"Your image has been encrypted succesfully, and can be found at {DefaultFolders.AesEncryptedImages}");
+                MessageBox.Show($"Your image has been encrypted succesfully, and can be found at {DefaultFolders.AesEncryptedImages}");
                 ((MainWindow)Application.Current.MainWindow).LblEncrypt.Content = "Encrypt: image is encrypted";
 
                 this.Close();

@@ -73,7 +73,7 @@ namespace WPFEncryptionTool2PROA04
 
                 string[] aesCredentials = new FileHelper()
                     .WithFolder(DefaultFolders.GeneratedAesKeys)
-                    .WithFileName(CboAESKeys.SelectedItem.ToString())
+                    .WithFileName(CboAESKeys.SelectedItem.ToString() + ".txt")
                     .ReadFromFile().Split(';');
 
                 string aesKey = aesCredentials[0];
@@ -87,9 +87,11 @@ namespace WPFEncryptionTool2PROA04
             catch (CryptographicException ex)
             {
                 MessageBox.Show(ex.Message);
+                return;
             }
 
             MessageBox.Show($"Your image has been decrypted succesfully, and can be found at {DefaultFolders.Images}");
+            ((MainWindow)Application.Current.MainWindow).LblDecrypt.Content = "Decrypt: image is decrypted";
             this.Close();
         }
 
@@ -117,7 +119,7 @@ namespace WPFEncryptionTool2PROA04
         {
             string encryptedImage = new FileHelper()
                 .WithFolder(DefaultFolders.AesEncryptedImages)
-                .WithFileName(CboImages.SelectedItem.ToString())
+                .WithFileName(CboImages.SelectedItem.ToString() + ".txt")
                 .ReadFromFile();
 
             if (string.IsNullOrEmpty(encryptedImage))

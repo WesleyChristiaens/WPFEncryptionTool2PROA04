@@ -78,20 +78,23 @@ namespace WPFEncryptionTool2PROA04
 
                     using (FileStream fs = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
-                        using (XmlTextWriter xr = new XmlTextWriter(fs, Encoding.UTF8))
+                        using (StreamWriter sr = new StreamWriter(fs))
                         {
-                            xr.WriteString(_content);
+                            sr.Write(_content);
                         }
                     }
                 }
 
-                _fileName += ".txt";
-
-                using (FileStream fs = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                if (!_isXml)
                 {
-                    using (StreamWriter sr = new StreamWriter(fs))
+                    _fileName += ".txt";
+
+                    using (FileStream fs = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
-                        sr.Write(_content);
+                        using (StreamWriter sr = new StreamWriter(fs))
+                        {
+                            sr.Write(_content);
+                        }
                     }
                 }
             }
@@ -144,9 +147,12 @@ namespace WPFEncryptionTool2PROA04
 
         public IEnumerable<string> GetDirectoryContent()
         {
+
             if (string.IsNullOrEmpty(_folderPath))
             {
-                MessageBox.Show("Please specify directory.");
+                MessageBox.Show("Please set standard folder first.");
+                var wpf = new WpfOptions();
+                wpf.ShowDialog();
                 return null;
             }
 
