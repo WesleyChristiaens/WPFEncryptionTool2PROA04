@@ -38,7 +38,7 @@ namespace WPFEncryptionTool2PROA04
                 new FileHelper()
                     .WithFolder(DefaultFolders.RsaEncryptedAesKeys)
                     .WithFileName(CboAesKeys.SelectedItem.ToString())
-                    .ReadFromFile().Content
+                    .ReadFromFile()
             );
 
             try
@@ -52,7 +52,8 @@ namespace WPFEncryptionTool2PROA04
                         new FileHelper()
                             .WithFolder(DefaultFolders.RsaPrivateKeys)
                             .WithFileName(CboPrivateRsaKeys.SelectedItem.ToString())
-                            .ReadFromFile().Content
+                            .IsXmlFile(true)
+                            .ReadFromFile()
                     );
 
                     decryptedData = rsa.Decrypt(dataToDecrypt, true);

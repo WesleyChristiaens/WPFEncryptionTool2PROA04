@@ -65,7 +65,7 @@ namespace WPFEncryptionTool2PROA04
                     string[] aesCredentials = new FileHelper()
                         .WithFolder(DefaultFolders.GeneratedAesKeys)
                         .WithFileName(CboAESKeys.SelectedItem.ToString())
-                        .ReadFromFile().Content.Split(';');
+                        .ReadFromFile().Split(';');
 
                     string aesKey = aesCredentials[0];
                     string aesIv = aesCredentials[1];

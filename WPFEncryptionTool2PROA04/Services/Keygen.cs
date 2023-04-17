@@ -36,12 +36,14 @@ namespace WPFEncryptionTool2PROA04
                 .WithFolder(DefaultFolders.RsaPublicKeys)
                 .WithFileName(nameOfKey)
                 .WithContent(publicKey)
+                .IsXmlFile(true)
                 .SaveToFile();
 
             FileHelper fh = new FileHelper()
                 .WithFolder(DefaultFolders.RsaPrivateKeys)
                 .WithFileName(nameOfKey)
                 .WithContent(privateKey)
+                .IsXmlFile(true)
                 .SaveToFile();
         }
     }
