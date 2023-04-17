@@ -65,11 +65,18 @@ namespace WPFEncryptionTool2PROA04
             }
 
             MessageBox.Show(
-                $"AesKey successfully generated" +
-                $"{Environment.NewLine}" +
-                $"@{DefaultFolders.GeneratedAesKeys}");
+               $"AesKey successfully generated" +
+               $"{Environment.NewLine}" +
+               $"@{DefaultFolders.GeneratedAesKeys}");
 
-            
+            private void AESEncrypt_Click(object sender, RoutedEventArgs e)
+        {
+            var wpf = new WpfAesEncryption();
+            wpf.ShowDialog();
+            if (LblEncrypt.Content.ToString() == "Encrypt: image is encrypted")
+            {
+                RSAEncrypt.IsEnabled = true;
+            }
         }
 
         private void RSADecrypt_Click(object sender, RoutedEventArgs e)
@@ -79,8 +86,6 @@ namespace WPFEncryptionTool2PROA04
             => new WpfAesDecryption().ShowDialog();
 
 
-        private void AESEncrypt_Click(object sender, RoutedEventArgs e)
-            => new WpfAesEncryption().ShowDialog();
 
         private void RSAEncrypt_Click(object sender, RoutedEventArgs e)
             => new RSA_Encryption().ShowDialog();

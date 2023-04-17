@@ -85,6 +85,7 @@ namespace WPFEncryptionTool2PROA04
 
                 MessageBox.Show(
                     $"Your image has been encrypted succesfully, and can be found at {DefaultFolders.AesEncryptedImages}");
+                ((MainWindow)Application.Current.MainWindow).LblEncrypt.Content = "Encrypt: image is encrypted";
 
                 this.Close();
 
